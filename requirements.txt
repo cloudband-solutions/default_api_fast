@@ -10,7 +10,6 @@ PyJWT>=2.10,<3
 Werkzeug>=3.1,<4
 boto3>=1.35,<2
 python-multipart>=0.0.9,<1
-invoke>=2.2,<3
 pytest>=8.3,<9
 factory_boy>=3.3,<4
 httpx>=0.28,<1

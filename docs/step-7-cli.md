@@ -1,28 +1,28 @@
-# 7) Command-line routines (`bin/rake`)
+# 7) Command-line routines (`python -m app.cli`)
 
-FastAPI does not ship with a built-in task runner, so this starter uses
-`invoke` and wraps it with `bin/rake` to provide namespaced commands.
+FastAPI does not ship with a built-in task runner, so this starter exposes a
+small Python command runner through `app/cli.py`.
 
 ## 7.1 Run a command
 ```bash
-./bin/rake system.greet
-./bin/rake db.create
-./bin/rake spec
+python -m app.cli server
+python -m app.cli spec spec/users/test_create.py
+python -m app.cli system.greet
+python -m app.cli db.create
+python -m app.cli db.upgrade
 ```
 
 ## 7.2 Where tasks live
-- `tasks.py`: task definitions and namespaces
-- `app/cli.py`: reusable task helpers such as database creation
-- `bin/rake`: thin wrapper around `python -m invoke`
+- `app/cli.py`: command parsing and reusable helpers such as database creation
+- `bin/spec`: optional thin wrapper around `python -m app.cli spec`
 
 ## 7.3 Template for new commands
 ```python
-from invoke import task
+import subprocess
 
 
-@task
-def seed(ctx):
-    ctx.run("python scripts/seed.py", pty=True)
+def run_seed(_args):
+    subprocess.run(["python", "scripts/seed.py"], check=False)
 ```
 
-Then add it to the root collection in `tasks.py`.
+Then register the handler in `build_parser()` inside `app/cli.py`.

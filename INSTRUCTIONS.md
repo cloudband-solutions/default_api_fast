@@ -5,13 +5,13 @@ cp .env.example .env
 python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-./bin/rake db.create
-./bin/rake db.upgrade
-./bin/rake server
+python -m app.cli db.create
+python -m app.cli db.upgrade
+python -m app.cli server
 ```
 
 Run specs with:
 
 ```bash
-./bin/spec
+python -m app.cli spec
 ```

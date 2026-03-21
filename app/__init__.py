@@ -1,12 +1,5 @@
 import importlib
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from app.db import db
-from app.environment import load_environment
-from app.storage import init_storage
-
 
 def _load_object(path):
     module_name, object_name = path.rsplit(".", 1)
@@ -15,6 +8,13 @@ def _load_object(path):
 
 
 def create_app(config_object="config.Config"):
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+
+    from app.db import db
+    from app.environment import load_environment
+    from app.storage import init_storage
+
     load_environment()
     settings = _load_object(config_object)
 

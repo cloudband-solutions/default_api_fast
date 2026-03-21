@@ -6,7 +6,7 @@
 - [4) Run with Gunicorn](step-4-gunicorn.md)
 - [5) Database setup and migrations (Alembic)](step-5-database-migrations.md)
 - [6) Specs](step-6-tests.md)
-- [7) Command-line routines (`bin/rake`)](step-7-cli.md)
+- [7) Command-line routines (`python -m app.cli`)](step-7-cli.md)
 - [8) Create a new model (example: Project)](step-8-create-model.md)
 - [9) Create a controller (example: Project)](step-9-create-controller.md)
 - [10) File uploads (local + S3)](step-10-file-uploads.md)

@@ -4,22 +4,28 @@ This template uses `pytest`, but the project layout and wrapper commands are
 set up to feel closer to RSpec:
 - specs live in `spec/`
 - factories live in `spec/factories.py`
-- `./bin/spec` runs the suite
-- `./bin/rake spec` is the task-runner equivalent
+- `python -m app.cli spec` is the primary test command
+- `./bin/spec` is an optional thin wrapper around it
 
 Run everything:
 ```bash
-./bin/spec
+python -m app.cli spec
 ```
 
 Run one file:
 ```bash
-./bin/spec spec/users/test_create.py
+python -m app.cli spec spec/users/test_create.py
 ```
 
 Filter by keyword:
 ```bash
-./bin/rake spec --keyword create
+python -m app.cli spec --keyword create
+```
+
+Optional wrapper:
+```bash
+./bin/spec
+./bin/spec spec/users/test_create.py
 ```
 
 The test app loads `spec.settings.TestConfig`, which defaults to the

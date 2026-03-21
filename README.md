@@ -7,7 +7,7 @@ database migrations, storage helpers, and domain-based request specs.
 It adds three Rails-style developer affordances by default:
 - `spec/` request specs powered by `pytest` and `factory_boy`
 - PostgreSQL-first SQLAlchemy + Alembic setup
-- namespaced command-line tasks through `invoke`, wrapped in `bin/rake`
+- namespaced command-line routines through `python -m app.cli`
 
 ## High-Level Setup
 
@@ -46,42 +46,48 @@ With the default values, the app expects PostgreSQL databases named:
 Create the configured development database:
 
 ```bash
-./bin/rake db.create
-./bin/rake db.upgrade
+python -m app.cli db.create
+python -m app.cli db.upgrade
 ```
 
 Create the test database:
 
 ```bash
-APP_ENV=test ./bin/rake db.create
-APP_ENV=test ./bin/rake db.upgrade
+APP_ENV=test python -m app.cli db.create
+APP_ENV=test python -m app.cli db.upgrade
 ```
 
 ## 4. Run specs
 Run the full spec suite:
 
 ```bash
-./bin/spec
+python -m app.cli spec
 ```
 
 Run a single spec file:
 
 ```bash
-./bin/spec spec/users/test_create.py
+python -m app.cli spec spec/users/test_create.py
 ```
 
-Run through the task runner:
+Filter by keyword:
 
 ```bash
-./bin/rake spec
-./bin/rake spec --keyword create
+python -m app.cli spec --keyword create
+```
+
+Optional convenience wrapper:
+
+```bash
+./bin/spec
+./bin/spec spec/users/test_create.py
 ```
 
 ## 5. Start the development server
 Run the local FastAPI server with reload enabled:
 
 ```bash
-./bin/rake server
+python -m app.cli server
 ```
 
 This starts Uvicorn on `http://127.0.0.1:3000`.
@@ -99,7 +105,7 @@ Useful development endpoints:
 - [4) Run with Gunicorn](docs/step-4-gunicorn.md)
 - [5) Database setup and migrations (Alembic)](docs/step-5-database-migrations.md)
 - [6) Specs](docs/step-6-tests.md)
-- [7) Command-line routines (`bin/rake`)](docs/step-7-cli.md)
+- [7) Command-line routines (`python -m app.cli`)](docs/step-7-cli.md)
 - [8) Create a new model (example: Project)](docs/step-8-create-model.md)
 - [9) Create a controller (example: Project)](docs/step-9-create-controller.md)
 - [10) File uploads (local + S3)](docs/step-10-file-uploads.md)

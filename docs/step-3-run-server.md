@@ -2,7 +2,7 @@
 
 Start the development server:
 ```bash
-./bin/rake server
+python -m app.cli server
 ```
 
 This runs:
