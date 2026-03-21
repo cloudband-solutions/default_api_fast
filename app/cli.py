@@ -1,5 +1,6 @@
 import argparse
 import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -76,8 +77,32 @@ def _active_settings():
 
 
 def _run_command(command, env=None):
-    result = subprocess.run(command, env=env)
-    return result.returncode
+    def _normalize_return_code(return_code):
+        if return_code == -signal.SIGINT:
+            return 130
+        return return_code
+
+    process = subprocess.Popen(
+        command,
+        env=env,
+        start_new_session=True,
+    )
+    try:
+        return _normalize_return_code(process.wait())
+    except KeyboardInterrupt:
+        try:
+            os.killpg(process.pid, signal.SIGINT)
+        except ProcessLookupError:
+            pass
+
+        try:
+            return _normalize_return_code(process.wait(timeout=5))
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            return _normalize_return_code(process.wait())
 
 
 def _command_env():
