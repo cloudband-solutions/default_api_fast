@@ -18,4 +18,4 @@ class TestConfig(Config):
     SECRET_KEY = "test-secret-32-bytes-minimum-key"
     STORAGE_SERVICE = os.getenv("STORAGE_SERVICE", "local")
     STORAGE_LOCAL_ROOT = os.getenv("STORAGE_LOCAL_ROOT", str(Path("storage_test")))
-    STORAGE_LOCAL_PUBLIC_ENDPOINT = os.getenv("STORAGE_LOCAL_PUBLIC_ENDPOINT", "/api/files")
+    STORAGE_LOCAL_PUBLIC_ENDPOINT = os.getenv("STORAGE_LOCAL_PUBLIC_ENDPOINT", "/files")

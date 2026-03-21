@@ -93,10 +93,10 @@ python -m app.cli server
 This starts Uvicorn on `http://127.0.0.1:3000`.
 
 Useful development endpoints:
-- `GET /api/health`
-- `POST /api/login`
-- `GET /api/users`
-- `POST /api/uploads`
+- `GET /health`
+- `POST /login`
+- `GET /users`
+- `POST /uploads`
 
 ## Steps
 - [1) Create a new project from this codebase](docs/step-1-create-project.md)

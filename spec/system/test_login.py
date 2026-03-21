@@ -5,7 +5,7 @@ def test_login_returns_token(client, db_session):
     user = UserFactory(email="admin@example.com")
 
     response = client.post(
-        "/api/login",
+        "/login",
         json={"email": user.email, "password": "password"},
     )
 

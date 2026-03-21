@@ -1,6 +1,6 @@
 def test_create_user(client, auth_headers):
     response = client.post(
-        "/api/users",
+        "/users",
         headers=auth_headers,
         json={
             "email": "new-user@example.com",

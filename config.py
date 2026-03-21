@@ -34,7 +34,7 @@ def _load_database_config():
 class Config:
     APP_NAME = os.getenv("APP_NAME", "Default API Fast")
     APP_ENV = os.getenv("APP_ENV", "development")
-    API_PREFIX = os.getenv("API_PREFIX", "/api")
+    API_PREFIX = os.getenv("API_PREFIX", "")
 
     _db_config = _load_database_config()
     SQLALCHEMY_DATABASE_URI = os.getenv(
@@ -48,7 +48,7 @@ class Config:
 
     STORAGE_SERVICE = os.getenv("STORAGE_SERVICE", "local")
     STORAGE_LOCAL_ROOT = os.getenv("STORAGE_LOCAL_ROOT", str(Path("storage")))
-    STORAGE_LOCAL_PUBLIC_ENDPOINT = os.getenv("STORAGE_LOCAL_PUBLIC_ENDPOINT", "/api/files")
+    STORAGE_LOCAL_PUBLIC_ENDPOINT = os.getenv("STORAGE_LOCAL_PUBLIC_ENDPOINT", "/files")
     STORAGE_S3_BUCKET = os.getenv("STORAGE_S3_BUCKET", "")
     STORAGE_S3_REGION = os.getenv("STORAGE_S3_REGION", "")
     STORAGE_S3_ENDPOINT = os.getenv("STORAGE_S3_ENDPOINT", "")

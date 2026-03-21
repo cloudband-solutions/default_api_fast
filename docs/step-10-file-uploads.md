@@ -8,11 +8,11 @@ are supported:
 ## 10.1 Local storage
 Default local storage uses:
 - root: `storage/`
-- public endpoint: `/api/files/{key}`
+- public endpoint: `/files/{key}`
 
 Upload a file:
 ```bash
-curl -F file=@avatar.png http://127.0.0.1:3000/api/uploads
+curl -F file=@avatar.png http://127.0.0.1:3000/uploads
 ```
 
 ## 10.2 S3 storage
