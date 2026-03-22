@@ -9,6 +9,24 @@ It adds three Rails-style developer affordances by default:
 - PostgreSQL-first SQLAlchemy + Alembic setup
 - namespaced command-line routines through `python -m app.cli`
 
+## Quick Start
+
+```bash
+cp .env.example .env
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+python -m app.cli db.create
+python -m app.cli db.upgrade
+python -m app.cli server
+```
+
+Run specs with:
+
+```bash
+python -m app.cli spec
+```
+
 ## High-Level Setup
 
 ## 1. Install dependencies
