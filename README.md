@@ -18,6 +18,7 @@ source env/bin/activate
 pip install -r requirements.txt
 python -m app.cli db.create
 python -m app.cli db.upgrade
+python -m app.cli system:seed
 python -m app.cli server
 ```
 
@@ -101,7 +102,21 @@ Optional convenience wrapper:
 ./bin/spec spec/users/test_create.py
 ```
 
-## 5. Start the development server
+## 5. Seed the default admin
+Seed the default admin user for local development:
+
+```bash
+python -m app.cli system:seed
+```
+
+This creates or updates:
+- `email`: `admin@example.com`
+- `first_name`: `admin`
+- `last_name`: `example`
+- `role`: `admin`
+- `password`: `password`
+
+## 6. Start the development server
 Run the local FastAPI server with reload enabled:
 
 ```bash
@@ -113,7 +128,7 @@ This starts Uvicorn on `http://127.0.0.1:3000`.
 Useful development endpoints:
 - `GET /health`
 - `POST /login`
-- `GET /users`
+- `/users` CRUD endpoints require an authenticated admin user
 - `POST /uploads`
 
 ## Steps

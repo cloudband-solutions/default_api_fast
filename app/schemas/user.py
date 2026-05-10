@@ -5,6 +5,7 @@ class UserCreate(BaseModel):
     email: str | None = None
     first_name: str | None = None
     last_name: str | None = None
+    role: str | None = None
     password: str | None = None
     password_confirmation: str | None = None
 
@@ -13,6 +14,7 @@ class UserUpdate(BaseModel):
     email: str | None = None
     first_name: str | None = None
     last_name: str | None = None
+    role: str | None = None
     password: str | None = None
     password_confirmation: str | None = None
 
@@ -24,6 +26,7 @@ class UserOut(BaseModel):
     last_name: str
     full_name: str
     status: str
+    role: str
 
 
 class UserCollection(BaseModel):

@@ -3,7 +3,7 @@ import re
 from sqlalchemy import select
 
 from app.helpers.api_helpers import build_password_hash
-from app.models.user import User
+from app.models.user import ALLOWED_USER_ROLES, User
 from app.operations.validator import Validator
 
 
@@ -17,6 +17,7 @@ class Save(Validator):
         email=None,
         first_name=None,
         last_name=None,
+        role=None,
         password=None,
         password_confirmation=None,
         user=None,
@@ -27,12 +28,14 @@ class Save(Validator):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
+        self.role = role
         self.password = password
         self.password_confirmation = password_confirmation
         self.payload = {
             "email": [],
             "first_name": [],
             "last_name": [],
+            "role": [],
             "password": [],
             "password_confirmation": [],
         }
@@ -46,6 +49,7 @@ class Save(Validator):
                     email=self.email,
                     first_name=self.first_name,
                     last_name=self.last_name,
+                    role=self.role or "user",
                     password_hash=build_password_hash(self.password),
                     status="active",
                 )
@@ -57,6 +61,8 @@ class Save(Validator):
                     self.user.first_name = self.first_name
                 if self.last_name:
                     self.user.last_name = self.last_name
+                if self.role:
+                    self.user.role = self.role
                 if self.password:
                     self.user.password_hash = build_password_hash(self.password)
 
@@ -78,6 +84,9 @@ class Save(Validator):
             if not self.last_name:
                 self.payload["last_name"].append("required")
 
+            if self.role and self.role not in ALLOWED_USER_ROLES:
+                self.payload["role"].append("invalid")
+
             if not self.password:
                 self.payload["password"].append("required")
 
@@ -96,6 +105,9 @@ class Save(Validator):
                     self.payload["email"].append("already taken")
                 elif not EMAIL_REGEX.match(self.email):
                     self.payload["email"].append("invalid format")
+
+            if self.role and self.role not in ALLOWED_USER_ROLES:
+                self.payload["role"].append("invalid")
 
             if self.password or self.password_confirmation:
                 if not self.password:

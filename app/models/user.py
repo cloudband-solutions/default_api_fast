@@ -7,6 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
 
+ALLOWED_USER_ROLES = {"user", "admin"}
+
+
 def utcnow():
     return datetime.now(timezone.utc)
 
@@ -20,6 +23,7 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending")
+    role: Mapped[str] = mapped_column(String(50), nullable=False, default="user")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -39,6 +43,7 @@ class User(Base):
             "last_name": self.last_name,
             "full_name": self.full_name(),
             "status": self.status,
+            "role": self.role,
         }
 
     def active(self):

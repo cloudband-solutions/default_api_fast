@@ -4,7 +4,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.dependencies.auth import require_active_user
+from app.dependencies.auth import require_admin_user
 from app.models.user import User
 from app.operations.users.save import Save as SaveUser
 from app.schemas.user import UserCollection, UserCreate, UserOut, UserUpdate
@@ -20,7 +20,7 @@ def index(
     status: str | None = None,
     page: int = 1,
     per_page: int = ITEMS_PER_PAGE,
-    _current_user: User = Depends(require_active_user),
+    _current_user: User = Depends(require_admin_user),
     session: Session = Depends(get_db),
 ):
     filters = []
@@ -64,7 +64,7 @@ def index(
 @router.get("/{user_id}", response_model=UserOut)
 def show(
     user_id: str,
-    _current_user: User = Depends(require_active_user),
+    _current_user: User = Depends(require_admin_user),
     session: Session = Depends(get_db),
 ):
     user = session.get(User, user_id)
@@ -76,7 +76,7 @@ def show(
 @router.post("", response_model=UserOut, status_code=201)
 def create(
     payload: UserCreate,
-    _current_user: User = Depends(require_active_user),
+    _current_user: User = Depends(require_admin_user),
     session: Session = Depends(get_db),
 ):
     cmd = SaveUser(
@@ -84,6 +84,7 @@ def create(
         email=payload.email,
         first_name=payload.first_name,
         last_name=payload.last_name,
+        role=payload.role,
         password=payload.password,
         password_confirmation=payload.password_confirmation,
     )
@@ -98,7 +99,7 @@ def create(
 def update(
     user_id: str,
     payload: UserUpdate,
-    _current_user: User = Depends(require_active_user),
+    _current_user: User = Depends(require_admin_user),
     session: Session = Depends(get_db),
 ):
     user = session.get(User, user_id)
@@ -111,6 +112,7 @@ def update(
         email=payload.email,
         first_name=payload.first_name,
         last_name=payload.last_name,
+        role=payload.role,
         password=payload.password,
         password_confirmation=payload.password_confirmation,
     )
@@ -124,7 +126,7 @@ def update(
 @router.delete("/{user_id}")
 def delete(
     user_id: str,
-    _current_user: User = Depends(require_active_user),
+    _current_user: User = Depends(require_admin_user),
     session: Session = Depends(get_db),
 ):
     user = session.get(User, user_id)

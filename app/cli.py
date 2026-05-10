@@ -170,6 +170,73 @@ def run_routes(_args):
     return 0
 
 
+def _upsert_admin_user(settings, *, email, first_name, last_name, password):
+    from sqlalchemy import select
+
+    from app.db import db
+    from app.helpers.api_helpers import build_password_hash
+    from app.models.user import User
+    from app.operations.users.save import Save as SaveUser
+
+    db.configure(settings.SQLALCHEMY_DATABASE_URI)
+    session = db.session()
+    try:
+        existing_user = session.scalar(select(User).where(User.email == email))
+        if existing_user is None:
+            cmd = SaveUser(
+                session=session,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                role="admin",
+                password=password,
+                password_confirmation=password,
+            )
+            cmd.execute()
+
+            if not cmd.valid():
+                return 1, cmd.payload
+
+            return 0, f"Admin user created: {cmd.user.email}"
+
+        existing_user.first_name = first_name
+        existing_user.last_name = last_name
+        existing_user.role = "admin"
+        existing_user.status = "active"
+        existing_user.password_hash = build_password_hash(password)
+        session.commit()
+
+        return 0, f"Admin user updated: {existing_user.email}"
+    finally:
+        session.close()
+
+
+def run_users_create_admin(args):
+    settings = _active_settings()
+    status_code, message = _upsert_admin_user(
+        settings,
+        email=args.email,
+        first_name=args.first_name,
+        last_name=args.last_name,
+        password=args.password,
+    )
+    print(message)
+    return status_code
+
+
+def run_system_seed(_args):
+    settings = _active_settings()
+    status_code, message = _upsert_admin_user(
+        settings,
+        email="admin@example.com",
+        first_name="admin",
+        last_name="example",
+        password="password",
+    )
+    print(message)
+    return status_code
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="python -m app.cli",
@@ -196,6 +263,9 @@ def build_parser():
     greet_parser = subparsers.add_parser("system.greet", help="Run the sample system task")
     greet_parser.set_defaults(handler=run_greet)
 
+    seed_parser = subparsers.add_parser("system:seed", help="Seed the default application data")
+    seed_parser.set_defaults(handler=run_system_seed)
+
     db_create_parser = subparsers.add_parser("db.create", help="Create the configured database")
     db_create_parser.set_defaults(handler=run_db_create)
 
@@ -219,6 +289,16 @@ def build_parser():
 
     routes_parser = subparsers.add_parser("routes", help="Print mounted routes")
     routes_parser.set_defaults(handler=run_routes)
+
+    users_create_admin_parser = subparsers.add_parser(
+        "users.create-admin",
+        help="Create an admin user in the configured database",
+    )
+    users_create_admin_parser.add_argument("--email", required=True)
+    users_create_admin_parser.add_argument("--first-name", default="Admin")
+    users_create_admin_parser.add_argument("--last-name", default="User")
+    users_create_admin_parser.add_argument("--password", required=True)
+    users_create_admin_parser.set_defaults(handler=run_users_create_admin)
 
     return parser
 

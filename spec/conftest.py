@@ -39,6 +39,13 @@ def db_session(app):
 
 @pytest.fixture()
 def auth_headers(app, db_session):
-    user = UserFactory(status="active")
+    user = UserFactory(status="active", role="admin")
+    token = generate_jwt(user.to_dict(), app.state.settings.SECRET_KEY)
+    return build_jwt_header(token)
+
+
+@pytest.fixture()
+def user_auth_headers(app, db_session):
+    user = UserFactory(status="active", role="user")
     token = generate_jwt(user.to_dict(), app.state.settings.SECRET_KEY)
     return build_jwt_header(token)
