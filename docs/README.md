@@ -1,5 +1,9 @@
 # Documentation
 
+For local SQS development, use `bin/start_ministack.sh`. It starts MiniStack on
+`http://localhost:4566`, creates a queue, and prints the `AWS_ENDPOINT` and
+`SQS_QUEUE_URL` values to use in your shell or `.env`.
+
 - [1) Create a new project from this codebase](step-1-create-project.md)
 - [2) Configure the environment](step-2-configure-environment.md)
 - [3) Run the server](step-3-run-server.md)

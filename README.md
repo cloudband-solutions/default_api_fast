@@ -56,6 +56,8 @@ Important variables:
 - `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`: PostgreSQL settings
 - `DATABASE_URL`: optional full database URL override
 - `STORAGE_*`: local or S3-backed file storage settings
+- `AWS_ENDPOINT`: set to `http://localhost:4566` when developing against MiniStack
+- `SQS_QUEUE_URL`: queue URL for the SQS queue your app should use
 
 With the default values, the app expects PostgreSQL databases named:
 - `default_api_fast_development`
@@ -124,6 +126,24 @@ python -m app.cli server
 ```
 
 This starts Uvicorn on `http://127.0.0.1:3000`.
+
+If you need local SQS, start MiniStack in a separate terminal:
+
+```bash
+bin/start_ministack.sh
+```
+
+That script starts MiniStack on `http://localhost:4566`, creates a FIFO queue,
+and prints the `AWS_ENDPOINT` and `SQS_QUEUE_URL` values to export into your
+shell or `.env`.
+
+Example:
+
+```bash
+export AWS_ENDPOINT=http://localhost:4566
+export SQS_QUEUE_URL=http://localhost:4566/000000000000/tphlms.fifo
+python -m app.cli server
+```
 
 Useful development endpoints:
 - `GET /health`
