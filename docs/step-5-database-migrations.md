@@ -2,23 +2,23 @@
 
 ## 5.1 Create the configured database
 ```bash
-python -m app.cli db.create
+python -m app.cli db:create
 ```
 
 For the test database:
 ```bash
-APP_ENV=test python -m app.cli db.create
+APP_ENV=test python -m app.cli db:create
 ```
 
 ## 5.2 Apply migrations
 ```bash
-python -m app.cli db.upgrade
+python -m app.cli db:upgrade
 ```
 
 ## 5.3 Generate a new migration from your models
 ```bash
 python -m app.cli db.migrate --message "add projects"
-python -m app.cli db.upgrade
+python -m app.cli db:upgrade
 ```
 
 ## 5.4 Roll back migrations

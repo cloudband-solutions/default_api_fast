@@ -16,8 +16,8 @@ cp .env.example .env
 python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-python -m app.cli db.create
-python -m app.cli db.upgrade
+python -m app.cli db:create
+python -m app.cli db:upgrade
 python -m app.cli system:seed
 python -m app.cli server
 ```
@@ -67,15 +67,15 @@ With the default values, the app expects PostgreSQL databases named:
 Create the configured development database:
 
 ```bash
-python -m app.cli db.create
-python -m app.cli db.upgrade
+python -m app.cli db:create
+python -m app.cli db:upgrade
 ```
 
 Create the test database:
 
 ```bash
-APP_ENV=test python -m app.cli db.create
-APP_ENV=test python -m app.cli db.upgrade
+APP_ENV=test python -m app.cli db:create
+APP_ENV=test python -m app.cli db:upgrade
 ```
 
 ## 4. Run specs

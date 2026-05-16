@@ -266,14 +266,14 @@ def build_parser():
     seed_parser = subparsers.add_parser("system:seed", help="Seed the default application data")
     seed_parser.set_defaults(handler=run_system_seed)
 
-    db_create_parser = subparsers.add_parser("db.create", help="Create the configured database")
+    db_create_parser = subparsers.add_parser("db:create", help="Create the configured database")
     db_create_parser.set_defaults(handler=run_db_create)
 
     db_migrate_parser = subparsers.add_parser("db.migrate", help="Generate a new migration")
     db_migrate_parser.add_argument("--message", default="update schema")
     db_migrate_parser.set_defaults(handler=run_db_migrate)
 
-    db_upgrade_parser = subparsers.add_parser("db.upgrade", help="Apply migrations")
+    db_upgrade_parser = subparsers.add_parser("db:upgrade", help="Apply migrations")
     db_upgrade_parser.add_argument("--revision", default="head")
     db_upgrade_parser.set_defaults(handler=run_db_upgrade)
 
