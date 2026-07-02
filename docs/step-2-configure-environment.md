@@ -8,6 +8,9 @@ pip install -r requirements.txt
 ```
 
 ## 2.2 Create `.env`
+Generated projects already include `.env`. If you are setting up this template
+repository directly, create it from `.env.example`:
+
 ```bash
 cp .env.example .env
 ```
@@ -41,7 +44,12 @@ SQS_QUEUE_URL=http://localhost:4566/000000000000/tphlms.fifo
 ```
 
 ## 2.4 Default database names
-With the supplied defaults, `database.yaml` resolves to:
-- development: `default_api_fast_development`
-- test: `default_api_fast_test`
-- production: `default_api_fast`
+`database.yaml` builds database names from `DB_NAME`:
+- development: `${DB_NAME}_development`
+- test: `${DB_NAME}_test`
+- production: `${DB_NAME}`
+
+For example, a generated project named `ragapi` uses:
+- development: `ragapi_development`
+- test: `ragapi_test`
+- production: `ragapi`

@@ -9,10 +9,38 @@ It adds three Rails-style developer affordances by default:
 - PostgreSQL-first SQLAlchemy + Alembic setup
 - namespaced command-line routines through `python -m app.cli`
 
+## Default Stack
+
+- API framework: `FastAPI`
+- ASGI servers: `Uvicorn` for local development, `Gunicorn` with Uvicorn workers for production-style runs
+- Database: `PostgreSQL`
+- ORM and migrations: `SQLAlchemy`, `Alembic`, `psycopg`
+- Configuration: `.env` files loaded with `python-dotenv`, plus `database.yaml`
+- Authentication: JWT tokens with `PyJWT`, password hashing with `Werkzeug`
+- File uploads: `python-multipart`
+- Storage: local filesystem by default, optional S3-compatible storage through `boto3`
+- Local queue development: MiniStack-compatible SQS via `bin/start_ministack.sh`
+- Testing: `pytest`, `factory_boy`, `httpx`
+- Project tooling: app-specific CLI commands through `python -m app.cli`
+
 ## Quick Start
 
+### Create a New Project
+
+Create a new project from this template:
+
 ```bash
-cp .env.example .env
+bin/create_project.sh ../my_api "My API"
+cd ../my_api
+```
+
+The generator creates a new directory, removes template-local files, rewrites
+project naming defaults, creates `.env` from `.env.example`, and initializes a
+fresh git repository.
+
+### Set Up the Generated Project
+
+```bash
 python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
@@ -40,7 +68,9 @@ pip install -r requirements.txt
 ```
 
 ## 2. Configure environment variables
-Create your local environment file from the template:
+If this project was created with `bin/create_project.sh`, `.env` has already
+been created from `.env.example`. If you are setting up the template repository
+itself, create it manually:
 
 ```bash
 cp .env.example .env
@@ -59,9 +89,10 @@ Important variables:
 - `AWS_ENDPOINT`: set to `http://localhost:4566` when developing against MiniStack
 - `SQS_QUEUE_URL`: queue URL for the SQS queue your app should use
 
-With the default values, the app expects PostgreSQL databases named:
-- `default_api_fast_development`
-- `default_api_fast_test`
+With the default values, the app expects PostgreSQL databases named from
+`DB_NAME`:
+- `${DB_NAME}_development`
+- `${DB_NAME}_test`
 
 ## 3. Create and migrate the database
 Create the configured development database:

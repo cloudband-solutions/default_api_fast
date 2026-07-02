@@ -1,53 +1,39 @@
 # 1) Create a new project from this codebase
 
-## 1.1 Copy the repository
+## 1.1 Generate the project
+Run this from the template repository:
+
 ```bash
-cp -R /home/ralampay/workspace/cloudband/default_api_fast /home/ralampay/workspace/cloudband/ragapi
+bin/create_project.sh /home/ralampay/workspace/cloudband/ragapi "RAG API"
 cd /home/ralampay/workspace/cloudband/ragapi
 ```
 
-## 1.2 Update the project naming defaults
-Search and replace the default name with your new one:
+The generator copies this template, removes local-only files, creates `.env`
+from `.env.example`, initializes a fresh git repository, and replaces:
+- `default_api_fast` with the new snake_case project name
+- `default-api-fast-secret` with the new default secret
+- `Default API Fast` with the display name
+
+If the display name is omitted, the generator derives one from the target
+directory name:
+
 ```bash
-rg -n "default_api_fast|default-api-fast|Default API Fast"
+bin/create_project.sh ../ragapi
 ```
 
-Update these files first:
-- `README.md`
-- `config.py`
-- `spec/settings.py`
-- `.env.example`
-- `.env.test`
-
-Suggested defaults:
-- `default_api_fast` -> `ragapi`
-- `default-api-fast-secret` -> `ragapi-secret`
-- `Default API Fast` -> `RAG API`
-
-Example edits:
-```python
-# config.py
-SQLALCHEMY_DATABASE_URI = os.getenv(
-    "DATABASE_URL",
-    _db_config.get("uri", "postgresql+psycopg://postgres:postgres@localhost:5432/ragapi_development"),
-)
-SECRET_KEY = os.getenv("SECRET_KEY", "ragapi-secret")
-```
-
-```python
-# spec/settings.py
-SQLALCHEMY_DATABASE_URI = _db_config.get(
-    "uri",
-    "postgresql+psycopg://postgres:postgres@localhost:5432/ragapi_test",
-)
-```
-
-## 1.3 Start a fresh git repository
-If you copied this project to start a new service, remove the original git
-history and initialize your own repository:
+## 1.2 Install and verify
 ```bash
-rm -rf .git
-git init
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+python -m app.cli db:create
+python -m app.cli db:upgrade
+python -m app.cli system:seed
+python -m app.cli spec
+```
+
+## 1.3 Create the initial commit
+```bash
 git add .
 git commit -m "Initial commit"
 ```

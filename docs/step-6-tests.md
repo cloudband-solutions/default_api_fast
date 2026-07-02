@@ -29,4 +29,5 @@ Optional wrapper:
 ```
 
 The test app loads `spec.settings.TestConfig`, which defaults to the
-`default_api_fast_test` PostgreSQL database.
+`${DB_NAME}_test` PostgreSQL database. For example, a generated project named
+`ragapi` uses `ragapi_test`.
