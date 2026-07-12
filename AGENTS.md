@@ -34,6 +34,45 @@
 - For validation-oriented commands, inherit from `Validator`, populate `payload`, and use `valid()` or `invalid()` after `execute()`.
 - Controllers should instantiate the command, call `execute()`, and translate the result into the HTTP response.
 
+Example command pattern, based on `Save` and `Login`:
+
+```python
+from app.operations.validator import Validator
+
+
+class CreateWidget(Validator):
+    def __init__(self, session, name=None):
+        super().__init__()
+        self.session = session
+        self.name = name
+        self.widget = None
+        self.payload = {"name": []}
+
+    def execute(self):
+        if not self.name:
+            self.payload["name"].append("required")
+
+        self.count_errors()
+
+        if self.valid():
+            self.widget = Widget(name=self.name)
+            self.session.add(self.widget)
+            self.session.commit()
+            self.session.refresh(self.widget)
+```
+
+The controller should only coordinate the command and HTTP response:
+
+```python
+command = CreateWidget(session=db, name=request.name)
+command.execute()
+
+if command.invalid():
+    raise HTTPException(status_code=422, detail=command.payload)
+
+return command.widget
+```
+
 ## Tests
 
 - Keep specs under `spec/<resource>/test_<action>.py`.
