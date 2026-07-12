@@ -20,7 +20,7 @@ It adds three Rails-style developer affordances by default:
 - File uploads: `python-multipart`
 - Storage: local filesystem by default, optional S3-compatible storage through `boto3`
 - Local queue development: MiniStack-compatible SQS via `bin/start_ministack.sh`
-- Testing: `pytest`, `factory_boy`, `httpx`
+- Testing: `pytest`, `factory_boy`, `httpx2`
 - Project tooling: app-specific CLI commands through `python -m app.cli`
 
 ## Quick Start
