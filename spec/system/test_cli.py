@@ -4,6 +4,7 @@ import pytest
 
 from app.cli import (
     build_parser,
+    main,
     run_db_create,
     run_db_current,
     run_db_downgrade,
@@ -48,6 +49,18 @@ def test_cli_routes_use_colon_namespaces(argv, handler):
     args = build_parser().parse_args(argv)
 
     assert args.handler is handler
+
+
+def test_server_accepts_custom_port(monkeypatch):
+    commands = []
+    monkeypatch.setattr("app.cli._run_command", lambda command: commands.append(command) or 0)
+
+    result = main(["server", "--port", "8080", "--no-reload"])
+
+    assert result == 0
+    assert commands == [
+        ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8080"]
+    ]
 
 
 @pytest.mark.parametrize(
