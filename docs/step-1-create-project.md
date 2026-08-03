@@ -8,11 +8,14 @@ bin/create_project.sh /home/ralampay/workspace/cloudband/ragapi "RAG API"
 cd /home/ralampay/workspace/cloudband/ragapi
 ```
 
-The generator copies this template, removes local-only files, creates `.env`
-from `.env.example`, initializes a fresh git repository, and replaces:
+The generator copies this template, including `Dockerfile`, `.dockerignore`, and
+`docker-compose.yml`; removes local-only files; creates `.env` from
+`.env.example`; initializes a fresh git repository; and replaces:
 - `default_api_fast` with the new snake_case project name
 - `default-api-fast-secret` with the new default secret
 - `Default API Fast` with the display name
+- Docker image, container, extension, and anchor names with the kebab-case
+  project name (for example, `ragapi` or `my-api`)
 
 If the display name is omitted, the generator derives one from the target
 directory name:

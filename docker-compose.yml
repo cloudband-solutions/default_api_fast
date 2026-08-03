@@ -1,0 +1,17 @@
+x-default-fast-api-base: &default-fast-api-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: default-fast-api:latest
+  env_file: .env
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+  app:
+    <<: *default-fast-api-base
+    container_name: "${CONTAINER_NAME:-default-fast-api}"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8081}:${DOCKER_PORT:-3000}"
+    network_mode: bridge

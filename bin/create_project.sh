@@ -56,6 +56,7 @@ display_name="${2:-$(
   printf '%s' "${project_slug}" |
     awk -F_ '{ for (i = 1; i <= NF; i++) { printf "%s%s", toupper(substr($i, 1, 1)) substr($i, 2), (i < NF ? " " : "") } }'
 )}"
+docker_name="${project_slug//_/-}"
 
 mkdir "${TARGET_DIR}"
 
@@ -76,6 +77,7 @@ mkdir "${TARGET_DIR}"
     --exclude='./htmlcov' \
     --exclude='./.coverage' \
     --exclude='./bin/create_project.sh' \
+    --exclude='./spec/system/test_create_project.py' \
     -cf - .
 ) | (
   cd "${TARGET_DIR}"
@@ -85,9 +87,11 @@ mkdir "${TARGET_DIR}"
 export TEMPLATE_SNAKE="default_api_fast"
 export TEMPLATE_SECRET="default-api-fast-secret"
 export TEMPLATE_TITLE="Default API Fast"
+export TEMPLATE_DOCKER_NAME="default-fast-api"
 export PROJECT_SNAKE="${project_slug}"
 export PROJECT_SECRET="${project_slug}-secret"
 export PROJECT_TITLE="${display_name}"
+export PROJECT_DOCKER_NAME="${docker_name}"
 
 find "${TARGET_DIR}" -type f \
   ! -path '*/.git/*' \
@@ -102,6 +106,7 @@ find "${TARGET_DIR}" -type f \
         s/\Q$ENV{TEMPLATE_SNAKE}\E/$ENV{PROJECT_SNAKE}/g;
         s/\Q$ENV{TEMPLATE_SECRET}\E/$ENV{PROJECT_SECRET}/g;
         s/\Q$ENV{TEMPLATE_TITLE}\E/$ENV{PROJECT_TITLE}/g;
+        s/\Q$ENV{TEMPLATE_DOCKER_NAME}\E/$ENV{PROJECT_DOCKER_NAME}/g;
       ' "${file}"
     fi
   done

@@ -34,9 +34,10 @@ bin/create_project.sh ../my_api "My API"
 cd ../my_api
 ```
 
-The generator creates a new directory, removes template-local files, rewrites
-project naming defaults, creates `.env` from `.env.example`, and initializes a
-fresh git repository.
+The generator creates a new directory, includes the `Dockerfile`,
+`.dockerignore`, and `docker-compose.yml` assets, removes template-local files,
+rewrites application and Docker naming defaults, creates `.env` from
+`.env.example`, and initializes a fresh git repository.
 
 ### Set Up the Generated Project
 
