@@ -6,16 +6,16 @@ database migrations, storage helpers, and domain-based request specs.
 
 It adds three Rails-style developer affordances by default:
 - `spec/` request specs powered by `pytest` and `factory_boy`
-- PostgreSQL-first SQLAlchemy + Alembic setup
+- PostgreSQL and SQLite support through SQLAlchemy, Alembic, and `database.yml`
 - namespaced command-line routines through `python -m app.cli`
 
 ## Default Stack
 
 - API framework: `FastAPI`
 - ASGI servers: `Uvicorn` for local development, `Gunicorn` with Uvicorn workers for production-style runs
-- Database: `PostgreSQL`
+- Database: PostgreSQL by default, with file-backed and in-memory SQLite support
 - ORM and migrations: `SQLAlchemy`, `Alembic`, `psycopg`
-- Configuration: `.env` files loaded with `python-dotenv`, plus `database.yaml`
+- Configuration: `.env` files loaded with `python-dotenv`, plus `database.yml`
 - Authentication: JWT tokens with `PyJWT`, password hashing with `Werkzeug`
 - File uploads: `python-multipart`
 - Storage: local filesystem by default, optional S3-compatible storage through `boto3`
@@ -45,13 +45,33 @@ rewrites application and Docker naming defaults, creates `.env` from
 python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
+```
+
+Choose your database in `database.yml` before running database commands.
+PostgreSQL is the default; start PostgreSQL and set `DB_*` in `.env` for development
+and `.env.test` for tests. For SQLite without a database server, replace the
+`development` and `test` sections with:
+
+```yaml
+development:
+  adapter: sqlite
+  database: storage/development.sqlite3
+test:
+  adapter: sqlite
+  database: ":memory:"
+```
+
+Then initialize the development database and start the app:
+
+```bash
 python -m app.cli db:create
 python -m app.cli db:upgrade
 python -m app.cli system:seed
 python -m app.cli server
 ```
 
-Run specs with:
+For PostgreSQL tests, first run `APP_ENV=test python -m app.cli db:create`.
+In-memory SQLite needs no database creation. Run specs with:
 
 ```bash
 python -m app.cli spec
@@ -78,14 +98,15 @@ cp .env.example .env
 ```
 
 By default, the project reads:
-- `.env` when `APP_ENV=development`
+- `.env` when `APP_ENV` is unset, `development`, or `production`
 - `.env.test` when `APP_ENV=test`
 
 Important variables:
-- `APP_ENV`: active environment, usually `development` or `test`
+- `APP_ENV`: YAML section to load; defaults to `development`
 - `SECRET_KEY`: JWT signing key
 - `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`: PostgreSQL settings
 - `DATABASE_URL`: optional full database URL override
+- `DATABASE_YAML`: optional configuration file path; defaults to `database.yml`
 - `STORAGE_*`: local or S3-backed file storage settings
 - `AWS_ENDPOINT`: set to `http://localhost:4566` when developing against MiniStack
 - `SQS_QUEUE_URL`: queue URL for the SQS queue your app should use
@@ -95,6 +116,18 @@ With the default values, the app expects PostgreSQL databases named from
 - `${DB_NAME}_development`
 - `${DB_NAME}_test`
 
+To use SQLite, change the desired environment in `database.yml` to:
+
+```yaml
+development:
+  adapter: sqlite
+  database: storage/development.sqlite3
+```
+
+PostgreSQL remains the default. Both adapters use the same database CLI commands.
+See [database configuration](docs/step-2-configure-environment.md#25-select-postgresql-or-sqlite)
+for test settings, connection overrides, and legacy configuration compatibility.
+
 ## 3. Create and migrate the database
 Create the configured development database:
 
@@ -103,12 +136,14 @@ python -m app.cli db:create
 python -m app.cli db:upgrade
 ```
 
-Create the test database:
+For PostgreSQL or file-backed SQLite, create and migrate the test database:
 
 ```bash
 APP_ENV=test python -m app.cli db:create
 APP_ENV=test python -m app.cli db:upgrade
 ```
+
+Skip these CLI steps for in-memory SQLite tests; fixtures create their schema.
 
 ## 4. Run specs
 Run the full spec suite:

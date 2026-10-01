@@ -2,9 +2,10 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.engine import make_url
 
 from app.environment import load_environment
-from app.db import Base, db
+from app.db import Base
 
 load_environment()
 
@@ -13,12 +14,11 @@ from app.models import user  # noqa: F401,E402
 
 
 config = context.config
-config.set_main_option("sqlalchemy.url", Config.SQLALCHEMY_DATABASE_URI)
+config.set_main_option("sqlalchemy.url", Config.SQLALCHEMY_DATABASE_URI.replace("%", "%%"))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-db.configure(Config.SQLALCHEMY_DATABASE_URI)
 target_metadata = Base.metadata
 
 
@@ -28,6 +28,7 @@ def run_migrations_offline():
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        render_as_batch=make_url(url).get_backend_name() == "sqlite",
         dialect_opts={"paramstyle": "named"},
     )
 
@@ -43,10 +44,16 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=connection.dialect.name == "sqlite",
+        )
 
         with context.begin_transaction():
             context.run_migrations()
+
+    connectable.dispose()
 
 
 if context.is_offline_mode():

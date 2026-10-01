@@ -17,3 +17,11 @@ venv
 storage
 storage_test
 spec
+
+# Local SQLite databases and sidecars
+*.db
+*.sqlite
+*.sqlite3
+*.db-*
+*.sqlite-*
+*.sqlite3-*

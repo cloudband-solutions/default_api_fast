@@ -3,6 +3,11 @@
 Start with [1) Create a new project from this codebase](step-1-create-project.md)
 when using this repository as a template for a new FastAPI service.
 
+The framework supports PostgreSQL (the default) and SQLite through
+`database.yml`. See [configuration](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
+for adapter examples and overrides, [migrations](step-5-database-migrations.md)
+for database setup, and [specs](step-6-tests.md#test-database-setup) for test databases.
+
 For local SQS development, use `bin/start_ministack.sh`. It starts MiniStack on
 `http://localhost:4566`, creates a queue, and prints the `AWS_ENDPOINT` and
 `SQS_QUEUE_URL` values to use in your shell or `.env`.

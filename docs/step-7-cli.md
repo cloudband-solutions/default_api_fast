@@ -28,6 +28,22 @@ fresh default admin user:
 - `role`: `admin`
 - `password`: `password`
 
+Database commands, seeding, and the server use the selected `APP_ENV` section
+of `database.yml`, defaulting to `development`. PostgreSQL and SQLite use the
+same commands. `DATABASE_URL` overrides the selected section; `DATABASE_YAML`
+selects a different configuration file. The `spec` command selects `test`.
+
+For example, create and migrate a file-backed test database:
+
+```bash
+APP_ENV=test python -m app.cli db:create
+APP_ENV=test python -m app.cli db:upgrade
+```
+
+Use file-backed SQLite when separate CLI commands and the server must share
+data. See [database setup and migrations](step-5-database-migrations.md) for
+adapter-specific prerequisites.
+
 ## 7.2 Where tasks live
 - `app/cli.py`: command parsing and reusable helpers such as database creation
 - `bin/spec`: optional thin wrapper around `python -m app.cli spec`

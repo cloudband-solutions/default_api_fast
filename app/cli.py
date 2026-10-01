@@ -27,7 +27,11 @@ def _ensure_sqlite_db(database_path):
 
     path.parent.mkdir(parents=True, exist_ok=True)
     engine = create_engine(f"sqlite:///{path}")
-    engine.connect().close()
+    try:
+        with engine.connect():
+            pass
+    finally:
+        engine.dispose()
     print(f"SQLite database ready at {path}")
 
 

@@ -64,6 +64,12 @@ mkdir "${TARGET_DIR}"
   cd "${SOURCE_DIR}"
   tar \
     --exclude='./.git' \
+    --exclude='*.db' \
+    --exclude='*.sqlite' \
+    --exclude='*.sqlite3' \
+    --exclude='*.db-*' \
+    --exclude='*.sqlite-*' \
+    --exclude='*.sqlite3-*' \
     --exclude='./.env' \
     --exclude='./.env.local' \
     --exclude='./env' \
