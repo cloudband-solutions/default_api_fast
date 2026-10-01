@@ -8,6 +8,12 @@ bin/create_project.sh /home/ralampay/workspace/cloudband/ragapi "RAG API"
 cd /home/ralampay/workspace/cloudband/ragapi
 ```
 
+On Windows, use `.\bin\create_project.ps1 ..\ragapi "RAG API"` in PowerShell,
+or `bin\create_project.bat ..\ragapi "RAG API"` in Command Prompt, then
+`cd ..\ragapi`. Both require Git on `PATH` and PowerShell 5.1 or newer.
+If PowerShell blocks script execution, invoke it with
+`powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\create_project.ps1 ..\ragapi "RAG API"`.
+
 The generator copies this template, including `Dockerfile`, `.dockerignore`, and
 `docker-compose.yml` and `database.yml`; excludes local SQLite databases and
 sidecars; removes local-only files; creates `.env` from
@@ -31,6 +37,9 @@ python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
+
+On Windows, replace the activation command with `.\env\Scripts\Activate.ps1`
+in PowerShell or `env\Scripts\activate.bat` in Command Prompt.
 
 [Configure PostgreSQL or SQLite](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
 in `database.yml`. PostgreSQL is the default and requires a running server plus

@@ -34,6 +34,23 @@ bin/create_project.sh ../my_api "My API"
 cd ../my_api
 ```
 
+On Windows, use PowerShell (5.1 or newer):
+
+```powershell
+.\bin\create_project.ps1 ..\my_api "My API"
+```
+
+Or Command Prompt:
+
+```bat
+bin\create_project.bat ..\my_api "My API"
+```
+
+Both Windows entry points require Git on `PATH`; the batch file calls the
+PowerShell implementation. If script execution is disabled, run
+`powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\bin\create_project.ps1 ..\my_api "My API"`.
+The display name is optional and defaults to the title-cased directory name.
+
 The generator creates a new directory, includes the `Dockerfile`,
 `.dockerignore`, and `docker-compose.yml` assets, removes template-local files,
 rewrites application and Docker naming defaults, creates `.env` from
@@ -46,6 +63,9 @@ python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
+
+On Windows, activate with `.\env\Scripts\Activate.ps1` in PowerShell or
+`env\Scripts\activate.bat` in Command Prompt.
 
 Choose your database in `database.yml` before running database commands.
 PostgreSQL is the default; start PostgreSQL and set `DB_*` in `.env` for development
@@ -89,7 +109,7 @@ pip install -r requirements.txt
 ```
 
 ## 2. Configure environment variables
-If this project was created with `bin/create_project.sh`, `.env` has already
+If this project was created with a `bin/create_project` script, `.env` has already
 been created from `.env.example`. If you are setting up the template repository
 itself, create it manually:
 

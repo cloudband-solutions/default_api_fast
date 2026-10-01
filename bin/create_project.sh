@@ -83,6 +83,8 @@ mkdir "${TARGET_DIR}"
     --exclude='./htmlcov' \
     --exclude='./.coverage' \
     --exclude='./bin/create_project.sh' \
+    --exclude='./bin/create_project.ps1' \
+    --exclude='./bin/create_project.bat' \
     --exclude='./spec/system/test_create_project.py' \
     -cf - .
 ) | (
