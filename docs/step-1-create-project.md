@@ -41,10 +41,10 @@ pip install -r requirements.txt
 On Windows, replace the activation command with `.\env\Scripts\Activate.ps1`
 in PowerShell or `env\Scripts\activate.bat` in Command Prompt.
 
-[Configure PostgreSQL or SQLite](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
-in `database.yml`. PostgreSQL is the default and requires a running server plus
-`DB_*` settings in `.env` and `.env.test`. For SQLite, use a file for development
-and `":memory:"` for tests.
+The supplied [`database.yml`](../database.yml) uses SQLite with
+`storage/development.sqlite3` for normal development and `test.sqlite3` for
+tests. See [Configure PostgreSQL or SQLite](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
+if you need a different adapter.
 
 Initialize the development database:
 
@@ -54,13 +54,15 @@ python -m app.cli db:upgrade
 python -m app.cli system:seed
 ```
 
-For PostgreSQL or file-backed SQLite tests, run
-`APP_ENV=test python -m app.cli db:create` first. In-memory SQLite needs no
-separate creation step. Then verify:
+Then verify with the isolated SQLite test database:
 
 ```bash
 python -m app.cli spec
 ```
+
+The spec command selects the `test` section automatically. Its fixtures create
+and drop tables in `test.sqlite3`, so no separate test database or migration
+command is required.
 
 ## 1.3 Create the initial commit
 ```bash

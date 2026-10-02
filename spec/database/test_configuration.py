@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import yaml
 from sqlalchemy.engine import make_url
@@ -15,6 +17,26 @@ def isolated_config(tmp_path, monkeypatch):
 
 def write_config(tmp_path, body, name="database.yml"):
     (tmp_path / name).write_text("test:\n" + body)
+
+
+def test_project_test_environment_uses_dedicated_sqlite_file(monkeypatch):
+    project_database_config = Path(__file__).parents[2] / "database.yml"
+    monkeypatch.setenv("DATABASE_YAML", str(project_database_config))
+
+    url = make_url(config.resolve_database_uri("test"))
+
+    assert url.get_backend_name() == "sqlite"
+    assert url.database == "test.sqlite3"
+
+
+def test_project_production_environment_uses_container_sqlite_volume(monkeypatch):
+    project_database_config = Path(__file__).parents[2] / "database.yml"
+    monkeypatch.setenv("DATABASE_YAML", str(project_database_config))
+
+    url = make_url(config.resolve_database_uri("production"))
+
+    assert url.get_backend_name() == "sqlite"
+    assert url.database == "/data/production.sqlite3"
 
 
 def test_postgresql_fields_encode_credentials(tmp_path, monkeypatch):

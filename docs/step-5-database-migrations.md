@@ -5,6 +5,15 @@ The app and Alembic use the same [connection settings and override precedence](s
 Run commands from the project root so relative configuration and SQLite paths
 resolve consistently. Commands default to `APP_ENV=development`.
 
+With the supplied SQLite configuration, normal development uses
+`storage/development.sqlite3`:
+
+```bash
+python -m app.cli db:create
+python -m app.cli db:upgrade
+python -m app.cli server
+```
+
 ## 5.1 Create the configured database
 
 ```bash
@@ -27,15 +36,16 @@ cannot persist between processes.
 python -m app.cli db:upgrade
 ```
 
-For PostgreSQL or file-backed SQLite in the test environment:
+To create and migrate `test.sqlite3` for a manual test-environment session:
 
 ```bash
 APP_ENV=test python -m app.cli db:create
 APP_ENV=test python -m app.cli db:upgrade
 ```
 
-Request specs create and drop their own tables, so they do not require this
-migration step. See [test database setup](step-6-tests.md#test-database-setup).
+These test-environment commands are not required before running specs. Request
+specs create and drop their own tables in `test.sqlite3`. See
+[test database setup](step-6-tests.md#test-database-setup).
 Use `APP_ENV=production` with these same commands to select production settings.
 
 ## 5.3 Generate a new migration from your models

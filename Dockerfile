@@ -3,7 +3,9 @@ FROM python:3.14-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    HOME=/app
+    HOME=/app \
+    APP_ENV=production \
+    DATABASE_URL=sqlite:////data/production.sqlite3
 
 WORKDIR /app
 
@@ -13,12 +15,14 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-RUN addgroup --system app && \
-    adduser --system --ingroup app app && \
-    mkdir -p storage && \
-    chown -R app:app /app
+RUN addgroup --gid 10001 app && \
+    adduser --uid 10001 --gid 10001 --disabled-password --gecos "" app && \
+    mkdir -p storage /data && \
+    chown -R app:app /app /data
 
 USER app
+
+VOLUME ["/data"]
 
 EXPOSE 3000
 

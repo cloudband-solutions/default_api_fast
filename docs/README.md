@@ -3,8 +3,9 @@
 Start with [1) Create a new project from this codebase](step-1-create-project.md)
 when using this repository as a template for a new FastAPI service.
 
-The framework supports PostgreSQL (the default) and SQLite through
-`database.yml`. See [configuration](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
+The framework uses separate SQLite files for development and tests by default,
+and also supports PostgreSQL through `database.yml`. See
+[configuration](step-2-configure-environment.md#25-select-postgresql-or-sqlite)
 for adapter examples and overrides, [migrations](step-5-database-migrations.md)
 for database setup, and [specs](step-6-tests.md#test-database-setup) for test databases.
 

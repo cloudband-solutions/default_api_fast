@@ -12,6 +12,11 @@ services:
     <<: *default-fast-api-base
     container_name: "${CONTAINER_NAME:-default-fast-api}"
     restart: unless-stopped
+    environment:
+      APP_ENV: production
+      DATABASE_URL: sqlite:////data/production.sqlite3
     ports:
       - "127.0.0.1:${HOST_PORT:-8081}:${DOCKER_PORT:-3000}"
+    volumes:
+      - "${SQLITE_DATA_PATH:-./data}:/data"
     network_mode: bridge

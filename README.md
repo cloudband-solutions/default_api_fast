@@ -13,7 +13,7 @@ It adds three Rails-style developer affordances by default:
 
 - API framework: `FastAPI`
 - ASGI servers: `Uvicorn` for local development, `Gunicorn` with Uvicorn workers for production-style runs
-- Database: PostgreSQL by default, with file-backed and in-memory SQLite support
+- Database: file-backed SQLite by default, with PostgreSQL and in-memory SQLite support
 - ORM and migrations: `SQLAlchemy`, `Alembic`, `psycopg`
 - Configuration: `.env` files loaded with `python-dotenv`, plus `database.yml`
 - Authentication: JWT tokens with `PyJWT`, password hashing with `Werkzeug`
@@ -67,10 +67,8 @@ pip install -r requirements.txt
 On Windows, activate with `.\env\Scripts\Activate.ps1` in PowerShell or
 `env\Scripts\activate.bat` in Command Prompt.
 
-Choose your database in `database.yml` before running database commands.
-PostgreSQL is the default; start PostgreSQL and set `DB_*` in `.env` for development
-and `.env.test` for tests. For SQLite without a database server, replace the
-`development` and `test` sections with:
+The supplied `database.yml` uses separate file-backed SQLite databases for
+development, tests, and the production container:
 
 ```yaml
 development:
@@ -78,10 +76,15 @@ development:
   database: storage/development.sqlite3
 test:
   adapter: sqlite
-  database: ":memory:"
+  database: test.sqlite3
+production:
+  adapter: sqlite
+  database: /data/production.sqlite3
 ```
 
-Then initialize the development database and start the app:
+For normal development, initialize `storage/development.sqlite3`, seed it, and
+start the app. These commands use the `development` section because `APP_ENV`
+defaults to `development`:
 
 ```bash
 python -m app.cli db:create
@@ -90,12 +93,37 @@ python -m app.cli system:seed
 python -m app.cli server
 ```
 
-For PostgreSQL tests, first run `APP_ENV=test python -m app.cli db:create`.
-In-memory SQLite needs no database creation. Run specs with:
+For testing, run:
 
 ```bash
 python -m app.cli spec
 ```
+
+The spec command selects `APP_ENV=test`, writes to `test.sqlite3`, and creates
+and drops the application tables around each test. It never uses
+`storage/development.sqlite3`. No separate test migration step is required.
+
+### Deploy on EC2 with persistent SQLite
+
+The Docker image uses `/data/production.sqlite3` in production, and Compose
+bind-mounts `${SQLITE_DATA_PATH}` at `/data`. On EC2, point that variable to a
+persistent host directory, preferably on EBS:
+
+```bash
+sudo mkdir -p /srv/default-api-fast/data
+sudo chown 10001:10001 /srv/default-api-fast/data
+printf '\nSQLITE_DATA_PATH=/srv/default-api-fast/data\n' >> .env
+
+docker compose build
+docker compose run --rm app python -m app.cli db:create
+docker compose run --rm app python -m app.cli db:upgrade
+docker compose up -d
+```
+
+The database remains at
+`/srv/default-api-fast/data/production.sqlite3` when the container is rebuilt or
+removed. See [the EC2 deployment guide](docs/step-4-gunicorn.md) for permissions,
+updates, backups, and SQLite scaling limits.
 
 ## High-Level Setup
 
@@ -131,20 +159,22 @@ Important variables:
 - `AWS_ENDPOINT`: set to `http://localhost:4566` when developing against MiniStack
 - `SQS_QUEUE_URL`: queue URL for the SQS queue your app should use
 
-With the default values, the app expects PostgreSQL databases named from
-`DB_NAME`:
-- `${DB_NAME}_development`
-- `${DB_NAME}_test`
-
-To use SQLite, change the desired environment in `database.yml` to:
+The default `database.yml` uses SQLite and isolates normal development from
+tests and the production container:
 
 ```yaml
 development:
   adapter: sqlite
   database: storage/development.sqlite3
+test:
+  adapter: sqlite
+  database: test.sqlite3
+production:
+  adapter: sqlite
+  database: /data/production.sqlite3
 ```
 
-PostgreSQL remains the default. Both adapters use the same database CLI commands.
+PostgreSQL remains supported. Both adapters use the same database CLI commands.
 See [database configuration](docs/step-2-configure-environment.md#25-select-postgresql-or-sqlite)
 for test settings, connection overrides, and legacy configuration compatibility.
 
@@ -156,14 +186,16 @@ python -m app.cli db:create
 python -m app.cli db:upgrade
 ```
 
-For PostgreSQL or file-backed SQLite, create and migrate the test database:
+To create or inspect the file-backed test database outside pytest, explicitly
+select the test environment:
 
 ```bash
 APP_ENV=test python -m app.cli db:create
 APP_ENV=test python -m app.cli db:upgrade
 ```
 
-Skip these CLI steps for in-memory SQLite tests; fixtures create their schema.
+These commands are optional for the spec suite because its fixtures create and
+drop the test schema automatically.
 
 ## 4. Run specs
 Run the full spec suite:

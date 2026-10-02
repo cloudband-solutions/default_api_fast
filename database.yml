@@ -1,26 +1,9 @@
-# Select a section with APP_ENV. DATABASE_URL overrides this file.
-# SQLite alternative for any section:
-#   adapter: sqlite
-#   database: storage/development.sqlite3
-# For in-memory tests: database: ":memory:"
 development:
-  adapter: postgresql
-  database: ${DB_NAME}_development
-  host: ${DB_HOST}
-  port: ${DB_PORT}
-  username: ${DB_USERNAME}
-  password: ${DB_PASSWORD}
+  adapter: sqlite
+  database: storage/development.sqlite3
 test:
-  adapter: postgresql
-  database: ${DB_NAME}_test
-  host: ${DB_HOST}
-  port: ${DB_PORT}
-  username: ${DB_USERNAME}
-  password: ${DB_PASSWORD}
+  adapter: sqlite
+  database: test.sqlite3
 production:
-  adapter: postgresql
-  database: ${DB_NAME}
-  host: ${DB_HOST}
-  port: ${DB_PORT}
-  username: ${DB_USERNAME}
-  password: ${DB_PASSWORD}
+  adapter: sqlite
+  database: /data/production.sqlite3

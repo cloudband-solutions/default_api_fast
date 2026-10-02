@@ -35,20 +35,31 @@ Optional wrapper:
 from `.env.test`. `DATABASE_URL` overrides that section, and `DATABASE_YAML`
 selects a custom file, just as for the app and CLI.
 
-### PostgreSQL (default)
+### SQLite (default)
 
-Configure `DB_*` in `.env.test`, start PostgreSQL, and create the test database:
+The supplied configuration uses a dedicated file outside the development
+storage directory:
+
+```yaml
+test:
+  adapter: sqlite
+  database: test.sqlite3
+```
+
+Run the suite directly:
 
 ```bash
-APP_ENV=test python -m app.cli db:create
 python -m app.cli spec
 ```
 
-The supplied configuration names it `${DB_NAME}_test`; a generated project named
-`ragapi` uses `ragapi_test`. Request fixtures create and drop application tables,
-so running migrations first is optional for these specs.
+The command sets `APP_ENV=test`. SQLite creates `test.sqlite3` as needed, and
+request fixtures create and drop its application tables around each test. The
+file remains after the suite and is ignored by Git. No `db:create` or migration
+command is required.
 
-### SQLite
+Keep test database files outside the local upload-storage directory. Test
+uploads use `storage_test/`, which fixtures remove during cleanup; development
+uploads and `storage/development.sqlite3` remain under `storage/`.
 
 For an in-memory database without editing configuration:
 
@@ -56,28 +67,18 @@ For an in-memory database without editing configuration:
 DATABASE_URL=sqlite:///:memory: python -m app.cli spec
 ```
 
-Or replace the `test` section in `database.yml`:
-
-```yaml
-test:
-  adapter: sqlite
-  database: ":memory:"
-```
-
-Then run `python -m app.cli spec`. No `db:create` or migration command is needed.
 The in-memory connection is shared across request threads within the test
 process, and request fixtures create and drop tables for each test.
 
-For file-backed SQLite, set `test.database` to `tmp/spec.sqlite3`, then run:
+### PostgreSQL
+
+To test with PostgreSQL instead, replace the `test` section, configure `DB_*`
+in `.env.test`, start PostgreSQL, and create the database:
 
 ```bash
 APP_ENV=test python -m app.cli db:create
 python -m app.cli spec
 ```
-
-Keep test database files outside the configured local upload-storage directory,
-which request fixtures remove during cleanup. SQLite database files and sidecars
-are excluded from Git, Docker build context, and generated projects.
 
 Use a dedicated test database: request fixtures drop application tables after
 each test. An exported `DATABASE_URL` still overrides the test section, so ensure

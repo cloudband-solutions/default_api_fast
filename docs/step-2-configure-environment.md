@@ -28,8 +28,8 @@ Key settings:
 Set `APP_ENV` in the shell to select an environment before dotenv loading.
 The default is `development`. The app loads `.env.test` when `APP_ENV=test`
 and `.env` otherwise, including production. Existing shell variables take
-precedence over dotenv values. Configure `.env.test` separately for PostgreSQL
-tests; changing `.env` does not change the test database settings.
+precedence over dotenv values. Test uploads use `storage_test/`, separate from
+the development `storage/` directory.
 
 ## 2.3 Local SQS with MiniStack
 If your development flow uses SQS, start MiniStack in a separate terminal:
@@ -50,21 +50,53 @@ AWS_ENDPOINT=http://localhost:4566
 SQS_QUEUE_URL=http://localhost:4566/000000000000/tphlms.fifo
 ```
 
-## 2.4 Default database names
-The supplied PostgreSQL sections in `database.yml` build database names from `DB_NAME`:
-- development: `${DB_NAME}_development`
-- test: `${DB_NAME}_test`
-- production: `${DB_NAME}`
+## 2.4 Default SQLite databases
 
-For example, a generated project named `ragapi` uses:
-- development: `ragapi_development`
-- test: `ragapi_test`
-- production: `ragapi`
+The supplied `database.yml` keeps each runtime isolated:
+
+- development: `storage/development.sqlite3`
+- test: `test.sqlite3`
+- production container: `/data/production.sqlite3`
+
+Commands use `development` unless `APP_ENV` selects another section.
+`python -m app.cli spec` selects `test` automatically. The production path is
+inside the container's `/data` volume, which must be mounted from persistent
+host storage.
 
 ## 2.5 Select PostgreSQL or SQLite
 
-`database.yml` has a section for each `APP_ENV`. PostgreSQL is the supplied
-default for development, test, and production. Structured PostgreSQL settings:
+`database.yml` has a section for each configured `APP_ENV`. SQLite is supplied
+for development, tests, and the production container:
+
+```yaml
+development:
+  adapter: sqlite
+  database: storage/development.sqlite3
+test:
+  adapter: sqlite
+  database: test.sqlite3
+production:
+  adapter: sqlite
+  database: /data/production.sqlite3
+```
+
+`sqlite3` is also accepted as an adapter name. SQLite uses Python's built-in
+driver and needs no server. Paths may be absolute or relative to the working
+directory.
+
+For normal development, create the file and apply migrations before starting
+the server:
+
+```bash
+python -m app.cli db:create
+python -m app.cli db:upgrade
+python -m app.cli server
+```
+
+For tests, run `python -m app.cli spec`. It selects `test.sqlite3`; fixtures
+create and drop the schema automatically, so no separate migration is needed.
+
+To use PostgreSQL instead, replace the desired section with structured settings:
 
 ```yaml
 development:
@@ -83,24 +115,9 @@ The `database` field is required. A Unix-socket directory such as
 Quote literal numeric passwords so YAML reads them as strings. Environment
 variables are expanded after parsing, so passwords with URL punctuation work.
 
-To use SQLite, replace the desired environment section:
-
-```yaml
-development:
-  adapter: sqlite
-  database: storage/development.sqlite3
-test:
-  adapter: sqlite
-  database: ":memory:"
-```
-
-`sqlite3` is also accepted. SQLite uses Python's built-in driver and needs no
-server. Replace the whole section so unused PostgreSQL variables are no longer
-referenced. Keep any other environment sections you still use. Paths may be absolute or relative to the working directory. Run
-`python -m app.cli db:create` to create the file and its parent directories,
-then `python -m app.cli db:upgrade` to apply migrations. In-memory databases
-exist only within one process; use file-backed SQLite for separate CLI/server
-processes. The test fixtures create the schema for in-memory tests automatically.
+Replace the whole section so unused settings from the other adapter are no
+longer referenced. `DATABASE_URL=sqlite:///:memory:` remains available for
+one-process experiments, but file-backed SQLite is the documented default.
 
 ## 2.6 Overrides and legacy configuration
 

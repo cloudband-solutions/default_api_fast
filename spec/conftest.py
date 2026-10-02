@@ -2,18 +2,19 @@ import os
 import shutil
 from pathlib import Path
 
-import pytest
-from fastapi.testclient import TestClient
+os.environ["APP_ENV"] = "test"
 
-from app import create_app
-from app.db import Base, db
-from app.helpers.api_helpers import build_jwt_header, generate_jwt
-from spec.factories import UserFactory
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+
+from app import create_app  # noqa: E402
+from app.db import Base, db  # noqa: E402
+from app.helpers.api_helpers import build_jwt_header, generate_jwt  # noqa: E402
+from spec.factories import UserFactory  # noqa: E402
 
 
 @pytest.fixture()
 def app():
-    os.environ["APP_ENV"] = "test"
     application = create_app("spec.settings.TestConfig")
     Base.metadata.create_all(bind=db.engine)
     yield application
